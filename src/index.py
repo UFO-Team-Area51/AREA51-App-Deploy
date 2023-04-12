@@ -1143,59 +1143,68 @@ def Undo_UET():
     Input('uet-date-picker-range', 'start_date'),
     Input('uet-date-picker-range', 'end_date'),
 
-    prevent_initial_call=False,
+    prevent_initial_call=True,
 )
 def run_report(n_clicks, start_date_mbm, end_date_mbm, start_date_uet, end_date_uet):
 
-    #Reads Agent file in order to get list of agent names
-    df = pd.read_excel(r'Agents.xlsx')
-    agent_list = df['Name']
+    # Sets button trigger ID
+    triggered_id = ctx.triggered_id
 
-    #Sets up blank lists to be used later
-    dfs_mbm = []
-    dfs_uet = []
+    if triggered_id == 'run-report_btn':
 
-    #Cycles through list of agents and opens each excel files
-    for i in agent_list:
-        agent_list == i
-        dict_df = pd.read_excel(i+'.xlsx', sheet_name=[i+'_MBM_Worked', i+'_UET_Worked'])
-    
-        dfw_m = dict_df.get(i+'_MBM_Worked')
-        dfw_m.rename(columns ={i+'_MBM_Worked': "Date_Time"}, inplace = True)
-        dfw_m['Name'] = i
-        dfs_mbm.append(dfw_m)
+        # Reads Agent file in order to get list of agent names
+        df = pd.read_excel(r'Agents.xlsx')
+        agent_list = df['Name']
 
-        dfw_u = dict_df.get(i+'_UET_Worked')
-        dfw_u.rename(columns ={i+'_UET_Worked': "Date_Time"}, inplace = True)
-        dfw_u['Name'] = i
-        dfs_uet.append(dfw_u)
+        # Sets up blank lists to be used later
+        dfs_mbm = []
+        dfs_uet = []
 
-    #Raw combined files with each spreadsheet (MBM/UET, with both columns)
-    dft_mbm = pd.concat(dfs_mbm, ignore_index=True)
-    dft_uet = pd.concat(dfs_uet, ignore_index=True)
+        # Cycles through list of agents and opens each excel files
+        for i in agent_list:
+            agent_list == i
+            dict_df = pd.read_excel(i + '.xlsx', sheet_name=[i + '_MBM_Worked', i + '_UET_Worked'])
 
-    # MBM sort and organize by date 
-    dft_mbm['Date_Time'] = pd.to_datetime(dft_mbm['Date_Time'])
-    dft_mbm.sort_values(by='Date_Time', ascending=True, inplace=True)
-    dft_mbm.reset_index(drop=True, inplace=True)
-    dft_mbm_master = pd.DataFrame(dft_mbm)
+            dfw_m = dict_df.get(i + '_MBM_Worked')
+            dfw_m.rename(columns={i + '_MBM_Worked': "Date_Time"}, inplace=True)
+            dfw_m['Name'] = i
+            dfs_mbm.append(dfw_m)
 
+            dfw_u = dict_df.get(i + '_UET_Worked')
+            dfw_u.rename(columns={i + '_UET_Worked': "Date_Time"}, inplace=True)
+            dfw_u['Name'] = i
+            dfs_uet.append(dfw_u)
 
-    # UET sort and organize by date 
-    dft_uet['Date_Time'] = pd.to_datetime(dft_uet['Date_Time'])
-    dft_uet.sort_values(by='Date_Time', ascending=True, inplace=True)
-    dft_uet.reset_index(drop=True, inplace=True)
-    dft_uet_master = pd.DataFrame(dft_uet)
+        # Raw combined files with each spreadsheet (MBM/UET, with both columns)
+        dft_mbm = pd.concat(dfs_mbm, ignore_index=True)
+        dft_uet = pd.concat(dfs_uet, ignore_index=True)
 
-    # Writes data to excel file
-    writer = pd.ExcelWriter('MASTER.xlsx', engine='xlsxwriter')
-    with pd.ExcelWriter('MASTER.xlsx') as writer:
-        dft_mbm_master.to_excel(writer, sheet_name='MASTER_MBM_Worked', index=False)
-        dft_uet_master.to_excel(writer, sheet_name='MASTER_UET_Worked', index=False)
+        # MBM sort and organize by date
+        dft_mbm['Date_Time'] = pd.to_datetime(dft_mbm['Date_Time'])
+        dft_mbm.sort_values(by='Date_Time', ascending=True, inplace=True)
+        dft_mbm.reset_index(drop=True, inplace=True)
+        dft_mbm_master = pd.DataFrame(dft_mbm)
+
+        # UET sort and organize by date
+        dft_uet['Date_Time'] = pd.to_datetime(dft_uet['Date_Time'])
+        dft_uet.sort_values(by='Date_Time', ascending=True, inplace=True)
+        dft_uet.reset_index(drop=True, inplace=True)
+        dft_uet_master = pd.DataFrame(dft_uet)
+
+        # Writes data to excel file
+        writer = pd.ExcelWriter('MASTER.xlsx', engine='xlsxwriter')
+        with pd.ExcelWriter('MASTER.xlsx') as writer:
+            dft_mbm_master.to_excel(writer, sheet_name='MASTER_MBM_Worked', index=False)
+            dft_uet_master.to_excel(writer, sheet_name='MASTER_UET_Worked', index=False)
+
+    else:
+        pass
+
+    dft_master = pd.read_excel(r'Master.xlsx')
 
     #Counts undo counts and returns value
-    mbm_undo_count = dft_mbm_master['Action'].str.count('Undone').sum()
-    uet_undo_count = dft_uet_master['Action'].str.count('Undone').sum()
+    mbm_undo_count = dft_master['Action'].str.count('Undone').sum()
+    uet_undo_count = dft_master['Action'].str.count('Undone').sum()
     report_details = 'Finsihed report, there are {} counts of MBM Cases being undone and {} counts of UET Tickets being undone.'.format(mbm_undo_count, uet_undo_count)
 
     #Removes all rows that are not designated as assigning a ticket and resets index
@@ -1254,14 +1263,7 @@ def run_report(n_clicks, start_date_mbm, end_date_mbm, start_date_uet, end_date_
         }
     }
 
-
-    #Sets button trigger ID
-    triggered_id = ctx.triggered_id
-    
-    if triggered_id == 'run-report_btn':
-        return report_details, figure_mbm, figure_uet
-    else:
-        pass
+    return report_details, figure_mbm, figure_uet
 
 
 
