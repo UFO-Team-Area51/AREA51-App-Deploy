@@ -1188,8 +1188,8 @@ def run_report(n_clicks, start_date_mbm, end_date_mbm, start_date_uet, end_date_
     dft_uet_master = pd.DataFrame(dft_uet)
 
     # Writes data to excel file
-    writer = pd.ExcelWriter('/MASTER.xlsx', engine='xlsxwriter')  
-    with pd.ExcelWriter('/MASTER.xlsx') as writer:
+    writer = pd.ExcelWriter('MASTER.xlsx', engine='xlsxwriter')
+    with pd.ExcelWriter('MASTER.xlsx') as writer:
         dft_mbm_master.to_excel(writer, sheet_name='MASTER_MBM_Worked', index=False)
         dft_uet_master.to_excel(writer, sheet_name='MASTER_UET_Worked', index=False)
 
