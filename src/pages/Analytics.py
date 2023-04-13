@@ -58,10 +58,10 @@ dt_mstr_uet.set_index('Date_Time', inplace=True)
 daily_uet_counts = dt_mstr_uet.resample('D').count()
 
 #Gets current time in YYYY-MM-DD format
-now = datetime.now()
-timestamp_num = datetime.timestamp(now)
-time_now = datetime.fromtimestamp(timestamp_num)
-current_date_est = time_now.astimezone(pytz.timezone('US/Eastern')).strftime('%Y-%m-%d')
+# now = datetime.now()
+# timestamp_num = datetime.timestamp(now)
+# time_now = datetime.fromtimestamp(timestamp_num)
+# current_date_est = time_now.astimezone(pytz.timezone('US/Eastern')).strftime('%Y-%m-%d')
 
 
 
@@ -88,7 +88,7 @@ layout = dbc.Container([
         html.Summary('Click me to expand/collapse MBM Case Report', style = {'color' : '#00d257', 'textAlign': 'center', 'font-size' : '120%'}),
         dcc.DatePickerRange(id='mbm-date-picker-range',
         start_date=daily_mbm_counts.index.min().date(),
-        end_date=current_date_est),
+        end_date=daily_mbm_counts.index.max().date()),
 
         dcc.Graph(id='mbm-bar-chart'),
         
@@ -118,7 +118,7 @@ layout = dbc.Container([
         html.Summary('Click me to expand/collapse UET TIcket Report', style = {'color' : '#00d257', 'textAlign': 'center', 'font-size' : '120%'}),
         dcc.DatePickerRange(id='uet-date-picker-range',
         start_date=daily_uet_counts.index.min().date(),
-        end_date=current_date_est),
+        end_date=daily_uet_counts.index.max().date()),
 
         dcc.Graph(id='uet-bar-chart'),
 
