@@ -1231,20 +1231,30 @@ def run_report(n_clicks, start_date_mbm, end_date_mbm, start_date_uet, end_date_
         mask_mbm = (daily_mbm_counts.index >= start_date_mbm) & (daily_mbm_counts.index <= end_date_mbm)
         filtered_counts_mbm = daily_mbm_counts.loc[mask_mbm]
 
-        figure_mbm = {
-            'data': [{
+        figure_mbm = go.Figure(
+            go.Bar(
+                x=filtered_counts_mbm.index,
+                y=filtered_counts_mbm['Action'],
+                marker_color='blue'
+            )
+        )
+        figure_mbm.update_layout(title='MBM Case Assignment History')
+        #return fig
 
-                'x': filtered_counts_mbm.index,
-                'y': filtered_counts_mbm['Action'],
+        #figure_mbm = {
+            #'data': [{
 
-                'type': 'bar'
-            }],
-                'layout': {
-                'title': 'MBM Case Assignment History',
-                'xaxis': {'title': 'Date'},
-                'yaxis': {'title': 'Case Count'}
-            }
-        }
+                #'x': filtered_counts_mbm.index,
+                #'y': filtered_counts_mbm['Action'],
+
+                #'type': 'bar'
+            #}],
+                #'layout': {
+                #'title': 'MBM Case Assignment History',
+                #'xaxis': {'title': 'Date'},
+                #'yaxis': {'title': 'Case Count'}
+            #}
+        #}
 
         mask_uet = (daily_uet_counts.index >= start_date_uet) & (daily_uet_counts.index <= end_date_uet)
         filtered_counts_uet = daily_uet_counts.loc[mask_uet]

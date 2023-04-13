@@ -118,7 +118,7 @@ layout = dbc.Container([
         html.Summary('Click me to expand/collapse UET TIcket Report', style = {'color' : '#00d257', 'textAlign': 'center', 'font-size' : '120%'}),
         dcc.DatePickerRange(id='uet-date-picker-range',
         start_date=daily_uet_counts.index.min().date(),
-        end_date=daily_uet_counts.index.max().date()),
+        end_date=current_date_est),
 
         dcc.Graph(id='uet-bar-chart'),
 
