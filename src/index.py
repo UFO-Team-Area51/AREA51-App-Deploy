@@ -4,6 +4,7 @@ from dash import Dash, html, Input, Output, ctx, dcc, State
 from dash.dependencies import Input, Output
 import dash_bootstrap_components as dbc
 import plotly.express as px
+import plotly.graph_objects as go
 import time
 from time import sleep
 import threading
@@ -1136,13 +1137,12 @@ def Undo_UET():
     Output('report-output', 'children'),
     Output('mbm-bar-chart', 'figure'),
     Output('uet-bar-chart', 'figure'),
-    
+
     Input("run-report_btn", "n_clicks"),
     Input('mbm-date-picker-range', 'start_date'),
     Input('mbm-date-picker-range', 'end_date'),
     Input('uet-date-picker-range', 'start_date'),
     Input('uet-date-picker-range', 'end_date'),
-
     prevent_initial_call=True,
 )
 def run_report(n_clicks, start_date_mbm, end_date_mbm, start_date_uet, end_date_uet):
@@ -1197,74 +1197,75 @@ def run_report(n_clicks, start_date_mbm, end_date_mbm, start_date_uet, end_date_
             dft_mbm_master.to_excel(writer, sheet_name='MASTER_MBM_Worked', index=False)
             dft_uet_master.to_excel(writer, sheet_name='MASTER_UET_Worked', index=False)
 
+        sleep(2)
+
+        dft_master = pd.read_excel(r'Master.xlsx')
+
+        #Counts undo counts and returns value
+        mbm_undo_count = dft_master['Action'].str.count('Undone').sum()
+        uet_undo_count = dft_master['Action'].str.count('Undone').sum()
+        report_details = 'Finsihed report, there are {} counts of MBM Cases being undone and {} counts of UET Tickets being undone.'.format(mbm_undo_count, uet_undo_count)
+
+        #Removes all rows that are not designated as assigning a ticket and resets index
+        dft_mbm_master = dft_mbm_master[dft_mbm_master["Action"].str.contains('Assigned Ticket')]
+        dft_mbm_master.reset_index(drop=True, inplace=True)
+
+        #Convert MBM timestamps to datetime objects and sets the index as timestamps
+        dft_mbm_master['Date_Time'] = pd.to_datetime(dft_mbm_master['Date_Time'])
+        dft_mbm_master.set_index('Date_Time', inplace=True)
+
+        # Sets up timestamp increments by day
+        daily_mbm_counts = dft_mbm_master.resample('D').count()
+
+        #Removes all rows that are not designated as assigning a ticket and resets index
+        dft_uet_master = dft_uet_master[dft_uet_master["Action"].str.contains('Assigned Ticket')]
+        dft_uet_master.reset_index(drop=True, inplace=True)
+
+        #Convert UET timestamps to datetime objects and sets the index as timestamps
+        dft_uet_master['Date_Time'] = pd.to_datetime(dft_uet_master['Date_Time'])
+        dft_uet_master.set_index('Date_Time', inplace=True)
+
+        # Sets up timestamp increments by day
+        daily_uet_counts = dft_uet_master.resample('D').count()
+        dft_uet_master
+        mask_mbm = (daily_mbm_counts.index >= start_date_mbm) & (daily_mbm_counts.index <= end_date_mbm)
+        filtered_counts_mbm = daily_mbm_counts.loc[mask_mbm]
+
+        figure_mbm = {
+            'data': [{
+
+                'x': filtered_counts_mbm.index,
+                'y': filtered_counts_mbm['Action'],
+
+                'type': 'bar'
+            }],
+                'layout': {
+                'title': 'MBM Case Assignment History',
+                'xaxis': {'title': 'Date'},
+                'yaxis': {'title': 'Case Count'}
+            }
+        }
+
+        mask_uet = (daily_uet_counts.index >= start_date_uet) & (daily_uet_counts.index <= end_date_uet)
+        filtered_counts_uet = daily_uet_counts.loc[mask_uet]
+        figure_uet = {
+            'data': [{
+
+                'x': filtered_counts_uet.index,
+                'y': filtered_counts_uet['Action'],
+
+                'type': 'bar'
+            }],
+                'layout': {
+                'title': 'UET Ticket Assignment History',
+                'xaxis': {'title': 'Date'},
+                'yaxis': {'title': 'Ticket Count'}
+            }
+        }
+
+        return report_details, figure_mbm, figure_uet
     else:
         pass
-
-    dft_master = pd.read_excel(r'Master.xlsx')
-
-    #Counts undo counts and returns value
-    mbm_undo_count = dft_master['Action'].str.count('Undone').sum()
-    uet_undo_count = dft_master['Action'].str.count('Undone').sum()
-    report_details = 'Finsihed report, there are {} counts of MBM Cases being undone and {} counts of UET Tickets being undone.'.format(mbm_undo_count, uet_undo_count)
-
-    #Removes all rows that are not designated as assigning a ticket and resets index
-    dft_mbm_master = dft_mbm_master[dft_mbm_master["Action"].str.contains('Assigned Ticket')]
-    dft_mbm_master.reset_index(drop=True, inplace=True)
-
-    #Convert MBM timestamps to datetime objects and sets the index as timestamps
-    dft_mbm_master['Date_Time'] = pd.to_datetime(dft_mbm_master['Date_Time'])
-    dft_mbm_master.set_index('Date_Time', inplace=True)
-
-    # Sets up timestamp increments by day
-    daily_mbm_counts = dft_mbm_master.resample('D').count()
-
-    #Removes all rows that are not designated as assigning a ticket and resets index
-    dft_uet_master = dft_uet_master[dft_uet_master["Action"].str.contains('Assigned Ticket')]
-    dft_uet_master.reset_index(drop=True, inplace=True)
-
-    #Convert UET timestamps to datetime objects and sets the index as timestamps
-    dft_uet_master['Date_Time'] = pd.to_datetime(dft_uet_master['Date_Time'])
-    dft_uet_master.set_index('Date_Time', inplace=True)
-
-    # Sets up timestamp increments by day
-    daily_uet_counts = dft_uet_master.resample('D').count()
-    dft_uet_master
-    mask_mbm = (daily_mbm_counts.index >= start_date_mbm) & (daily_mbm_counts.index <= end_date_mbm)
-    filtered_counts_mbm = daily_mbm_counts.loc[mask_mbm]
-    figure_mbm = {
-        'data': [{
-
-            'x': filtered_counts_mbm.index,
-            'y': filtered_counts_mbm['Action'],
-
-            'type': 'bar'
-        }],
-            'layout': {
-            'title': 'MBM Case Assignment History',
-            'xaxis': {'title': 'Date'},
-            'yaxis': {'title': 'Case Count'}
-        }
-    }
-        
-    mask_uet = (daily_uet_counts.index >= start_date_uet) & (daily_uet_counts.index <= end_date_uet)
-    filtered_counts_uet = daily_uet_counts.loc[mask_uet]
-    figure_uet = {
-        'data': [{
-
-            'x': filtered_counts_uet.index,
-            'y': filtered_counts_uet['Action'],
-
-            'type': 'bar'
-        }],
-            'layout': {
-            'title': 'UET Ticket Assignment History',
-            'xaxis': {'title': 'Date'},
-            'yaxis': {'title': 'Ticket Count'}
-        }
-    }
-
-    return report_details, figure_mbm, figure_uet
-
 
 
 #MBM Download callback
