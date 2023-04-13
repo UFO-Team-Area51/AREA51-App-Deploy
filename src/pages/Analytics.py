@@ -57,13 +57,6 @@ dt_mstr_uet.set_index('Date_Time', inplace=True)
 # Sets up timestamp increments by day
 daily_uet_counts = dt_mstr_uet.resample('D').count()
 
-#Gets current time in YYYY-MM-DD format
-# now = datetime.now()
-# timestamp_num = datetime.timestamp(now)
-# time_now = datetime.fromtimestamp(timestamp_num)
-# current_date_est = time_now.astimezone(pytz.timezone('US/Eastern')).strftime('%Y-%m-%d')
-
-
 
 ##########################################
 
@@ -90,7 +83,7 @@ layout = dbc.Container([
         start_date=daily_mbm_counts.index.min().date(),
         end_date=daily_mbm_counts.index.max().date()),
 
-        dcc.Graph(id='mbm-bar-chart'),
+        #dcc.Graph(id='mbm-bar-chart'),
         
         html.Br(),
         html.Br(),
