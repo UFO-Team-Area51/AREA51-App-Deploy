@@ -1196,9 +1196,9 @@ def run_report(n_clicks, start_date_mbm, end_date_mbm, start_date_uet, end_date_
             dft_mbm_master.to_excel(writer, sheet_name='MASTER_MBM_Worked', index=False)
             dft_uet_master.to_excel(writer, sheet_name='MASTER_UET_Worked', index=False)
 
-        sleep(2)
+        #sleep(2)
 
-        dft_master = pd.read_excel(r'Master.xlsx')
+        #dft_master = pd.read_excel(r'Master.xlsx')
 
         #Counts undo counts and returns value
         mbm_undo_count = dft_mbm_master['Action'].str.count('Undone').sum()
