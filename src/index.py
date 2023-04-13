@@ -1201,8 +1201,8 @@ def run_report(n_clicks, start_date_mbm, end_date_mbm, start_date_uet, end_date_
         dft_master = pd.read_excel(r'Master.xlsx')
 
         #Counts undo counts and returns value
-        mbm_undo_count = dft_master['Action'].str.count('Undone').sum()
-        uet_undo_count = dft_master['Action'].str.count('Undone').sum()
+        mbm_undo_count = dft_mbm_master['Action'].str.count('Undone').sum()
+        uet_undo_count = dft_uet_master['Action'].str.count('Undone').sum()
         report_details = 'Finsihed report, there are {} counts of MBM Cases being undone and {} counts of UET Tickets being undone.'.format(mbm_undo_count, uet_undo_count)
 
         #Removes all rows that are not designated as assigning a ticket and resets index
@@ -1226,7 +1226,7 @@ def run_report(n_clicks, start_date_mbm, end_date_mbm, start_date_uet, end_date_
 
         # Sets up timestamp increments by day
         daily_uet_counts = dft_uet_master.resample('D').count()
-        dft_uet_master
+
         mask_mbm = (daily_mbm_counts.index >= start_date_mbm) & (daily_mbm_counts.index <= end_date_mbm)
         filtered_counts_mbm = daily_mbm_counts.loc[mask_mbm]
 
