@@ -9,3 +9,5 @@ SharePlum==0.5.1
 XlsxWriter==3.0.9
 gunicorn
 dash-tools
+dash-auth==1.3.2
+requests==2.24.0

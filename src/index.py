@@ -26,6 +26,18 @@ from pages import Tracker, Add_Remove_Agent, Analytics
 # Connect the navbar to the index
 from components import navbar
 
+import dash_auth
+
+# Keep this out of source code repository - save in a file or a database
+VALID_USERNAME_PASSWORD_PAIRS = {
+    'admin': 'ufo123'
+}
+
+auth = dash_auth.BasicAuth(
+    app,
+    VALID_USERNAME_PASSWORD_PAIRS
+)
+
 # define the navbar
 nav = navbar.Navbar()
 
