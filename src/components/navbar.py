@@ -18,7 +18,7 @@ def Navbar():
 
             brand="Agent Rotation Errand Assiger v5.1 (AREA 51)",
             brand_href="/Tracker",
-            color="#00d257",
+            color="#00c3ff", #Was 00d257
             dark=True,
             ),
         
