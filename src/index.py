@@ -20,7 +20,7 @@ import dash_auth
 
 # Keep this out of source code repository - save in a file or a database
 VALID_USERNAME_PASSWORD_PAIRS = {
-    'admin': 'ufo123'
+    'UFOArea51': 'FraudIsFluid_0'
 }
 
 auth = dash_auth.BasicAuth(
