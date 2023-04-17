@@ -7,7 +7,7 @@ import pandas as pd
 import pytz
 
 # Connect to main app.py file
-from app import app
+from app import app, server
 
 # Connect to pages folder and the pages apps inside it
 from pages import Tracker, Add_Remove_Agent, Analytics
